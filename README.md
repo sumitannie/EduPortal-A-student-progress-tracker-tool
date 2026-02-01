@@ -48,14 +48,6 @@ Designed to reduce teacher effort in:
 - Improving student performance strategies
 
 
-👩‍🏫 Teacher-Friendly Navigation
-
-- View Report Card for any student anytime
-
-- Persistent data (records remain after restart)
-
-- AI Assistant accessible directly from the dashboard
-
 
 🏫 Class-wise Filtering
 
@@ -70,15 +62,6 @@ Designed to reduce teacher effort in:
 
 - Designed to reduce teacher cognitive load
 
-🧠 Design Philosophy
-
-- Built to mirror real school workflows
-
-- Backend-driven architecture (Flask + Jinja)
-
-- AI used as decision support
-
-- Focused on teachability, maintainability, and explainability
 
 
 🛠️ Tech Stack
@@ -94,6 +77,7 @@ Designed to reduce teacher effort in:
 - AI Integration: Google Gemini (GenAI API), Prompt Engineering
 
 - Environment: Python Virtual Environment
+
 
 
 📂 Project Structure
