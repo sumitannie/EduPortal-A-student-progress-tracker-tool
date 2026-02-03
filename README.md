@@ -1,64 +1,70 @@
-# 🎓 Student Academics Tracker (Teacher Tool)
+🎓 CampusAssist – Student Academics & Attendance Tracker with AI
 
-A web-based Student Progress Tracking System with an AI-powered Teacher Assistant, built using Flask, designed specifically for school teachers to manage student records, generate report cards, and receive intelligent academic guidance.
+CampusAssist is a teacher-focused academic management system designed to simplify everyday school workflows.
+It enables teachers to manage student records, generate report cards, track attendance, and get academic assistance through an integrated AI chatbot.
 
-This project focuses on clarity, simplicity, real classroom usability, and AI-assisted decision support for teachers.
+Built with Flask and Python, the system focuses on clarity, usability, and real-world classroom needs.
 
 ✨ Key Features
-
 📋 Student Management
 
-- Add student details (Name, Roll Number, Class)
+- Add and store student details (Name, Roll, Class)
 
-- Store academic records permanently using JSON
+- Persistent storage using JSON
 
-- View all students in a clean list
-
+- View and manage all students from a single dashboard
 
 📄 Report Card Generation
 
-- Automatically generate school-style report cards
+- Automatically generates school-style report cards
 
 - Subject-wise marks and grades
 
-- Total marks, percentage, and overall grade
+- Total marks, percentage, grade, and teacher remarks
 
-- Teacher remarks section
+- Clean, printable layout for real classroom use
 
-- Printable, professional layout
+🗓 Attendance Management System
 
+- Mark daily attendance class-wise
 
-🤖 AI Teacher Assistant (CampusAssist AI)
+- Date-based attendance storage
+
+- Persistent records across application restarts
+
+📊 Student-wise Attendance Report
+
+- Total working days
+
+- Days present and absent
+
+- Attendance percentage
+
+- Date-wise attendance history
+
+🤖 CampusAssist AI (Teacher Assistant)
 
 - Built-in AI chatbot for teachers
 
-- Provides instant teaching guidance and academic suggestions
+Helps with:
 
-- Helps teachers support weak, average, and high-performing students
+- Teaching strategies
 
-- Generates clear, helpful and supportive responses.
+- Quiz and question generation
 
+- Student performance guidance
 
-Designed to reduce teacher effort in:
+- Academic planning ideas
 
-- Writing remarks
+- Supports conversation memory within a session
 
-- Planning interventions
+- Clean, bullet-point responses optimized for teachers
 
-- Improving student performance strategies
+🔍 Smart Search & Filtering
 
+- Search students by name
 
-
-🏫 Class-wise Filtering
-
-- Filter students by class (e.g., 8A, 9B)
-
-- Helps teachers managing multiple sections efficiently
-
-
-🔍 Search by Student Name
-
-- Search students by name or by class
+- Filter students by class
 
 - Designed to reduce teacher cognitive load
 
@@ -66,40 +72,45 @@ Designed to reduce teacher effort in:
 
 🛠️ Tech Stack
 
-- Frontend: HTML, CSS (Responsive, clean UI)
+- Frontend: HTML, CSS
 
 - Backend: Python, Flask
 
 - Templating: Jinja2
 
-- Data Storage: JSON file (students.json)
+- AI Integration: Google Gemini API
 
-- AI Integration: Google Gemini (GenAI API), Prompt Engineering
+- Session Management: Flask Sessions
+
+- Data Storage: JSON (students.json, attendance.json)
 
 - Environment: Python Virtual Environment
 
-
-
 📂 Project Structure
 ```bash
-student_progress/
+CampusAssist/
 │
-├── app.py                  # Flask backend + AI integration
-├── students.json           # Persistent student data
+├── app.py                  # Flask backend
+├── students.json           # Student academic data
+├── attendance.json         # Attendance records
 │
 ├── templates/
 │   ├── index.html          # Dashboard
-│   ├── add_students.html   # Add student form
-│   ├── students.html       # All students list (search & filter)
-│   ├── report.html         # Detailed report card
-│   └── ai_chat.html        # AI Teacher Assistant UI
+│   ├── add_students.html  # Add student
+│   ├── students.html      # Student list (search & filter)
+│   ├── report.html        # Report card
+│   ├── mark_attendance.html
+│   ├── student_attendance.html
+│   ├── ai_chat.html       # AI assistant
+│   └── _topbar.html       # Reusable navigation bar
 │
 ├── static/
 │   └── styles/
-│       └── style.css       # Application styling
+│       └── style.css      # Application styling
 │
-├── .env                    # Environment variables (API keys)
-└── README.md
+├── .env                   # API keys (ignored)
+├── README.md
+└── venv/
 ```
 
 ▶️ How to Run the Project
@@ -111,26 +122,29 @@ python -m venv venv
 
 Activate it:
 
-Windows:
+Windows
 
 venv\Scripts\activate
 
 
-
-Mac / Linux
+Mac/Linux
 
 source venv/bin/activate
 
+2️⃣ Install Dependencies
 
-2️⃣ Install Dependencies:
+pip install flask python-dotenv
 
-pip install flask python-dotenv google-genai
+google-generativeai
 
+3️⃣ Set Environment Variables
 
-3️⃣ Run the Application:
+Create a .env file:
 
+GEMINI_API_KEY=your_api_key_here
+
+4️⃣ Run the Application
 python app.py
-
 
 Open in browser:
 
@@ -141,49 +155,37 @@ http://127.0.0.1:5000/
 
 - Teacher adds student details
 
-- Backend calculates marks, grade, and remarks
+- System calculates grades and generates report cards
 
-- Data is stored in students.json
+- Teacher marks daily attendance
 
+- Attendance is stored date-wise
 
-Teacher can:
+- Student-wise attendance reports are generated
 
-- View all students
-
-- Filter by class
-
-- Search by name
-
-- Generate and view report cards
-
-- Ask CampusAssist AI for teaching and academic guidance
-
+- Teacher can consult CampusAssist AI for academic help
 
 🎯 Use Cases
 
 - School teachers
 
-- Academic record management
+-  Academic record management
 
-- AI-assisted teaching support
+- Attendance tracking
 
-- CS teaching aid (Flask, CRUD, AI integration)
-
-- Beginner-friendly school management system
+- Teaching assistance via AI
 
 
 🚀 Future Enhancements
 
-- Student-aware AI insights (AI reads marks and explains performance)
+- Class-wise attendance analytics
 
-- AI-generated personalized teacher remarks
+- Low-attendance alerts
 
-- Edit / Delete student records
+- PDF export for report cards
 
-- Attendance management
+- Teacher authentication system
 
-- PDF export of report cards
+- Role-based access (Admin / Teacher)
 
-- Teacher login system
-
-- Class-wise analytics dashboard
+- AI-powered student performance insights
