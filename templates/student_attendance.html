@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Attendance</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+</head>
+<body>
+
+<div class="container">
+  <h1>📊 Attendance Report</h1>
+
+  <div class="report-card">
+    <p><strong>Name:</strong> {{ student.name }}</p>
+    <p><strong>Roll:</strong> {{ student.roll }}</p>
+    <p><strong>Class:</strong> {{ student.class }}</p>
+
+    <hr>
+
+    <p><strong>Total Working Days:</strong> {{ total_days }}</p>
+    <p><strong>Days Present:</strong> {{ present_days }}</p>
+    <p><strong>Days Absent:</strong> {{ absent_days }}</p>
+    <p><strong>Attendance Percentage:</strong> {{ percentage }}%</p>
+  </div>
+
+  {% if history %}
+  <h3>📅 Attendance History</h3>
+
+  <table class="attendance-table">
+    <tr>
+      <th>Date</th>
+      <th>Status</th>
+    </tr>
+
+    {% for record in history %}
+    <tr>
+      <td>{{ record.date }}</td>
+      <td>{{ record.status }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+    <p>No attendance records available.</p>
+  {% endif %}
+
+  <a href="{{ url_for('students_list') }}" class="btn secondary">
+    ⬅ Back to Students
+  </a>
+</div>
+
+</body>
+</html>

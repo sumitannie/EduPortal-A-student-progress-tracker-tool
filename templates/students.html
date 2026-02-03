@@ -7,6 +7,8 @@
 </head>
 <body>
 
+{% include "_topbar.html" %}  
+
 <div class="container">
   <h1>👩‍🎓 All Students</h1>
   <p class="subtitle">
@@ -54,10 +56,17 @@
             <small>Class {{ s.class }} | Roll {{ s.roll }}</small>
           </div>
 
-          <a href="{{ url_for('view_report', student_id=s.id) }}"
-             class="btn secondary">
-            View Report Card
-          </a>
+          <div>
+            <a href="{{ url_for('view_report', student_id=s.id) }}"
+               class="btn secondary">
+              📄 Report
+            </a>
+
+            <a href="{{ url_for('student_attendance', student_id=s.id) }}"
+               class="btn secondary">
+              📊 Attendance
+            </a>
+          </div>
         </div>
         <hr>
       {% endfor %}
@@ -66,7 +75,7 @@
     <p>No students found.</p>
   {% endif %}
 
-  <a href="{{ url_for('home') }}" class="btn">⬅ Back to Dashboard</a>
+  
 </div>
 
 </body>

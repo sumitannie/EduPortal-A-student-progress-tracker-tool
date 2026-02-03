@@ -1,0 +1,12 @@
+<!-- 🔝 Top Navigation Bar -->
+<div class="top-bar">
+  <a href="{{ url_for('home') }}" class="back-btn">
+    ⬅ Back to Dashboard
+  </a>
+
+  {% if show_ai_button %}
+  <a href="{{ url_for('ai_chat') }}" class="ai-btn">
+    🤖 CampusAssist AI
+  </a>
+  {% endif %}
+</div>

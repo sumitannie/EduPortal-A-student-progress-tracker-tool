@@ -4,23 +4,22 @@ from google import genai
 from dotenv import load_dotenv
 import os
 import re
+from datetime import date
+
+# ------------------ SETUP ------------------
 
 load_dotenv()
-
 api_key = os.getenv("GEMINI_API_KEY")
-print("DEBUG → API KEY LOADED =", api_key)
 
 client = genai.Client(api_key=api_key)
 
 app = Flask(__name__)
-
-# 🔐 Secret key for session memory (random)
-app.secret_key = "campusassist_ai_secret_928374"
+app.secret_key = "campusassist_secret_482739"  # random secret key
 
 DATA_FILE = "students.json"
+ATTENDANCE_FILE = "attendance.json"
 
-
-# ---------- Helpers ----------
+# ------------------ HELPERS ------------------
 
 def load_students():
     if not os.path.exists(DATA_FILE):
@@ -28,24 +27,32 @@ def load_students():
     with open(DATA_FILE, "r") as f:
         return json.load(f)
 
-
 def save_students(students):
     with open(DATA_FILE, "w") as f:
         json.dump(students, f, indent=4)
 
+def load_attendance():
+    if not os.path.exists(ATTENDANCE_FILE):
+        return {}
+    with open(ATTENDANCE_FILE, "r") as f:
+        return json.load(f)
 
-# ---------- Routes ----------
+def save_attendance(data):
+    with open(ATTENDANCE_FILE, "w") as f:
+        json.dump(data, f, indent=4)
+
+# ------------------ ROUTES ------------------
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    return render_template("index.html", show_ai_button=True)
 
+# ---------- ADD STUDENT ----------
 
 @app.route("/add", methods=["GET", "POST"])
 def add_student():
     if request.method == "POST":
         students = load_students()
-
         student_id = len(students) + 1
 
         maths = int(request.form["maths"])
@@ -62,7 +69,7 @@ def add_student():
         else:
             grade, remark = "C", "Needs Improvement"
 
-        student = {
+        students.append({
             "id": student_id,
             "name": request.form["name"],
             "roll": request.form["roll"],
@@ -74,30 +81,26 @@ def add_student():
             "percentage": round(percent, 2),
             "grade": grade,
             "remark": remark
-        }
+        })
 
-        students.append(student)
         save_students(students)
-
         return redirect(url_for("view_report", student_id=student_id))
 
-    return render_template("add_students.html")
+    return render_template("add_students.html", show_ai_button=True)
 
+# ---------- ALL STUDENTS ----------
 
 @app.route("/students")
 def students_list():
     students = load_students()
-
     search_name = request.args.get("search")
     selected_class = request.args.get("class")
 
     classes = sorted(set(s["class"] for s in students))
 
     if search_name:
-        search_name = search_name.lower()
-        students = [s for s in students if search_name in s["name"].lower()]
+        students = [s for s in students if search_name.lower() in s["name"].lower()]
         selected_class = None
-
     elif selected_class:
         students = [s for s in students if s["class"] == selected_class]
 
@@ -106,27 +109,27 @@ def students_list():
         students=students,
         classes=classes,
         selected_class=selected_class,
-        search_name=search_name
+        search_name=search_name,
+        show_ai_button=True
     )
 
+# ---------- REPORT CARD ----------
 
 @app.route("/report/<int:student_id>")
 def view_report(student_id):
     students = load_students()
     student = next((s for s in students if s["id"] == student_id), None)
-    return render_template("report.html", student=student)
+    return render_template("report.html", student=student, show_ai_button=True)
 
-
-# ---------- AI Chat (WITH MEMORY) ----------
+# ---------- AI CHAT (WITH MEMORY) ----------
 
 @app.route("/ai", methods=["GET", "POST"])
 def ai_chat():
-    user_message = None
-    ai_response = None
-
-    # 🧠 Initialize memory
     if "chat_history" not in session:
         session["chat_history"] = []
+
+    user_message = None
+    ai_response = None
 
     if request.method == "POST":
         user_message = request.form["message"]
@@ -144,25 +147,16 @@ STYLE RULES:
 - Do NOT write long paragraphs
 """
 
-        # Add USER message to memory
         session["chat_history"].append({
             "role": "user",
             "content": user_message
         })
-        session.modified = True  # 🔒 REQUIRED
 
-        # Build Gemini conversation
-        contents = [
-            {
-                "role": "user",
-                "parts": [{"text": system_prompt}]
-            }
-        ]
+        contents = [{"role": "user", "parts": [{"text": system_prompt}]}]
 
         for msg in session["chat_history"]:
-            role = "user" if msg["role"] == "user" else "model"
             contents.append({
-                "role": role,
+                "role": "user" if msg["role"] == "user" else "model",
                 "parts": [{"text": msg["content"]}]
             })
 
@@ -172,40 +166,100 @@ STYLE RULES:
                 contents=contents
             )
 
-            raw = response.candidates[0].content.parts[0].text.strip()
-
-            # ---------- POST-PROCESSING ----------
+            raw = response.candidates[0].content.parts[0].text
             raw = raw.replace("•", "-").replace("*", "-")
             raw = raw.replace(". -", ".\n-")
 
             points = re.split(r"\n-\s*", raw)
+            clean = [f"- {p.strip().rstrip('.')}" for p in points if p.strip()]
 
-            clean_lines = []
-            for p in points:
-                p = p.strip()
-                if p:
-                    clean_lines.append(f"- {p.rstrip('.')}")
+            ai_response = "\n".join(clean[:8])
 
-            ai_response = "\n".join(clean_lines[:8])
-
-            # Add AI response to memory (IMPORTANT: role = model)
             session["chat_history"].append({
                 "role": "model",
                 "content": ai_response
             })
+
             session.modified = True
 
         except Exception as e:
             print("AI ERROR:", e)
-            ai_response = "- AI service is temporarily unavailable\n- Please try again later"
+            ai_response = "- AI service unavailable\n- Please try again later"
 
     return render_template(
         "ai_chat.html",
         user_message=user_message,
-        ai_response=ai_response
+        ai_response=ai_response,
+        show_ai_button=False
     )
 
-# ---------- Run ----------
+# ---------- MARK ATTENDANCE ----------
+
+@app.route("/attendance/mark", methods=["GET", "POST"])
+def mark_attendance():
+    students = load_students()
+    attendance = load_attendance()
+    today = date.today().isoformat()
+
+    selected_class = request.args.get("class")
+    classes = sorted(set(s["class"] for s in students))
+
+    if selected_class:
+        students = [s for s in students if s["class"] == selected_class]
+
+    if request.method == "POST":
+        attendance.setdefault(today, {})
+        for s in students:
+            status = request.form.get(str(s["id"]))
+            if status:
+                attendance[today][str(s["id"])] = status
+        save_attendance(attendance)
+        return redirect(url_for("home"))
+
+    return render_template(
+        "mark_attendance.html",
+        students=students,
+        classes=classes,
+        selected_class=selected_class,
+        today=today,
+        show_ai_button=True
+    )
+
+# ---------- STUDENT ATTENDANCE ----------
+
+@app.route("/attendance/student/<int:student_id>")
+def student_attendance(student_id):
+    students = load_students()
+    attendance = load_attendance()
+
+    student = next((s for s in students if s["id"] == student_id), None)
+    if not student:
+        return "Student not found"
+
+    total = present = 0
+    history = []
+
+    for d, records in attendance.items():
+        if str(student_id) in records:
+            total += 1
+            if records[str(student_id)] == "Present":
+                present += 1
+            history.append({"date": d, "status": records[str(student_id)]})
+
+    percent = round((present / total) * 100, 2) if total else 0
+
+    return render_template(
+        "student_attendance.html",
+        student=student,
+        total_days=total,
+        present_days=present,
+        absent_days=total - present,
+        percentage=percent,
+        history=history,
+        show_ai_button=True
+    )
+
+# ------------------ RUN ------------------
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -19,9 +19,16 @@
   <p class="subtitle">Teacher Tool for Managing Student Performance</p>
 
   <div class="card">
-    <a href="{{ url_for('add_student') }}" class="btn">➕ Add Student</a>
+    <a href="{{ url_for('add_student') }}" class="btn">
+      ➕ Add Student
+    </a>
+
     <a href="{{ url_for('students_list') }}" class="btn secondary">
       👩‍🎓 All Students
+    </a>
+
+    <a href="{{ url_for('mark_attendance') }}" class="attendance-btn">
+      🗓 Mark Attendance
     </a>
   </div>
 </div>
